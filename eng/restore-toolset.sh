@@ -1,4 +1,6 @@
 function InitializeCustomSDKToolset {
+
+
   if [[ "$restore" != true ]]; then
     return
   fi
@@ -9,12 +11,13 @@ function InitializeCustomSDKToolset {
     return
   fi
 
+
   InitializeDotNetCli true
-  InstallDotNetSharedFramework "1.0.5"
-  InstallDotNetSharedFramework "1.1.2"
-  InstallDotNetSharedFramework "2.1.0"
-  InstallDotNetSharedFramework "2.2.8"
-  InstallDotNetSharedFramework "3.1.0"
+  # InstallDotNetSharedFramework "1.0.5"
+  # InstallDotNetSharedFramework "1.1.2"
+  # InstallDotNetSharedFramework "2.1.0"
+  # InstallDotNetSharedFramework "2.2.8"
+  # InstallDotNetSharedFramework "3.1.0"
 }
 
 # Installs additional shared frameworks for testing purposes
@@ -26,6 +29,7 @@ function InstallDotNetSharedFramework {
   if [[ ! -d "$fx_dir" ]]; then
     GetDotNetInstallScript "$dotnet_root"
     local install_script=$_GetDotNetInstallScript
+
 
     bash "$install_script" --version $version --install-dir "$dotnet_root" --runtime "dotnet"
     local lastexitcode=$?
