@@ -186,6 +186,62 @@ Global
 EndGlobal
 ";
 
+        private const string ExpectedSlnFileAfterAddingNestedProjVS = @"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26124.0
+MinimumVisualStudioVersion = 15.0.26124.0
+Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""foo"", ""foo\foo.csproj"", ""{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}""
+EndProject
+Project(""{2150E333-8FDC-42A3-9474-1A3956D46DE8}"") = ""foo"", ""foo"", ""{55D261E6-330E-4DCB-8EA4-CACC85AFC965}""
+EndProject
+Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""bar"", ""foo\bar\bar.csproj"", ""{66953D80-2CA9-450B-8DE8-5CC0DB45F990}""
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Debug|x64.Build.0 = Debug|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Debug|x86.Build.0 = Debug|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Release|x64.ActiveCfg = Release|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Release|x64.Build.0 = Release|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Release|x86.ActiveCfg = Release|Any CPU
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E}.Release|x86.Build.0 = Release|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Debug|x64.Build.0 = Debug|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Debug|x86.Build.0 = Debug|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Release|x64.ActiveCfg = Release|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Release|x64.Build.0 = Release|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Release|x86.ActiveCfg = Release|Any CPU
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{66953D80-2CA9-450B-8DE8-5CC0DB45F990} = {55D261E6-330E-4DCB-8EA4-CACC85AFC965}
+		{7EF11D96-ED8D-4E0D-9DAA-8C085445F59E} = {55D261E6-330E-4DCB-8EA4-CACC85AFC965}
+	EndGlobalSection
+EndGlobal
+";
+
         private const string ExpectedSlnFileAfterAddingProjectWithoutMatchingConfigs = @"
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
@@ -581,6 +637,32 @@ EndGlobal
             var expectedSlnContents = GetExpectedSlnContents(slnPath, ExpectedSlnFileAfterAddingNestedProj);
             File.ReadAllText(slnPath)
                 .Should().BeVisuallyEquivalentTo(expectedSlnContents);
+        }
+
+        [Fact]
+        public void WhenNestedProjectIsAddedSolutionNoFolderIsCreated() //!!!!
+        {
+            var projectDirectory = _testAssetsManager
+                .CopyTestAsset("TestAppWithSlnAndCsprojInSubDirVS")
+                .WithSource()
+                .Path;
+
+            var projectToAdd = "foo";
+            var cmd = new DotnetCommand(Log)
+                .WithWorkingDirectory(projectDirectory)
+                .Execute($"sln", "App.sln", "add", projectToAdd);
+            cmd.Should().Pass();
+
+            projectToAdd = Path.Combine("foo", "bar");
+            cmd = new DotnetCommand(Log)
+                .WithWorkingDirectory(projectDirectory)
+                .Execute($"sln", "App.sln", "add", projectToAdd);
+            cmd.Should().Pass();
+
+            var slnPath = Path.Combine(projectDirectory, "App.sln");
+            // var expectedSlnContents = GetExpectedSlnContents(slnPath, ExpectedSlnFileAfterAddingNestedProjVS);
+            File.ReadAllText(slnPath)
+                .Should().BeVisuallyEquivalentTo(ExpectedSlnFileAfterAddingNestedProjVS);
         }
 
         [Fact]
