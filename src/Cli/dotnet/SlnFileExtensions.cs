@@ -81,7 +81,7 @@ namespace Microsoft.DotNet.Tools.Common
                     projectInstance,
                     slnFile.ProjectConfigurationsSection.GetOrCreatePropertySet(slnProject.Id));
 
-                if (solutionFolders != null)
+                if (solutionFolders != null && solutionFolders.Any())
                 {
                     slnFile.AddSolutionFolders(slnProject, solutionFolders);
                 }
