@@ -645,7 +645,7 @@ EndGlobal
         }
 
         [Fact]
-        public void WhenNestedProjectIsAddedSolutionNoFolderIsCreated() //!!!!
+        public void WhenNestedProjectIsAddedSolutionNoFolderIsCreated()
         {
             var projectDirectory = _testAssetsManager
                 .CopyTestAsset("TestAppWithSlnAndCsprojInSubDirVS")
