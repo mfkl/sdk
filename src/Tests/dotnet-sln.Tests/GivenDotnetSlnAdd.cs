@@ -669,10 +669,10 @@ EndGlobal
                 .Execute($"build", "App.sln");
             cmd.Should().Pass();
 
-            // var slnPath = Path.Combine(projectDirectory, "App.sln");
+            var slnPath = Path.Combine(projectDirectory, "App.sln");
             // var expectedSlnContents = GetExpectedSlnContents(slnPath, ExpectedSlnFileAfterAddingNestedProjVS);
-            // File.ReadAllText(slnPath)
-            //     .Should().BeVisuallyEquivalentTo(ExpectedSlnFileAfterAddingNestedProjVS);
+            File.ReadAllText(slnPath)
+                .Should().BeVisuallyEquivalentTo(ExpectedSlnFileAfterAddingNestedProjVS);
         }
 
         [Fact]
