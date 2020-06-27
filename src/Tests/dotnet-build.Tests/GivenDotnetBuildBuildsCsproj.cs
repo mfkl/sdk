@@ -172,5 +172,21 @@ namespace Microsoft.DotNet.Cli.Build.Tests
                 cmd.Should().NotHaveStdOutContaining("Copyright (C) Microsoft Corporation. All rights reserved.");
             }
         }
+
+        [Fact]
+        public void DotnetBuildSupportLongPath()
+        {
+            var longPathProject = Path.Combine("TestProjects", "LongPathProject/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing");
+
+            var testInstance = _testAssetsManager.CopyTestAsset("thisisaveryveryverylongpathanditkeepsgoing", testAssetSubdirectory: longPathProject)
+                .WithSource()
+                .Restore(Log);
+
+            var cmd = new DotnetBuildCommand(Log)
+               .WithWorkingDirectory(testInstance.Path)
+               .Execute();
+
+            cmd.Should().Pass();
+        }
     }
 }
