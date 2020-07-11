@@ -176,15 +176,13 @@ namespace Microsoft.DotNet.Cli.Build.Tests
         [Fact]
         public void DotnetBuildSupportLongPath()
         {
-            var longPathProject = Path.Combine("TestProjects", "LongPathProject/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing/thisisaveryveryverylongpathanditkeepsgoing");
+            var currentLocation = Directory.GetCurrentDirectory();
+            var root = Path.GetFullPath(Path.Combine(currentLocation, @"..\..\..\.."));
+            var targetLocation = Path.Combine(root, @"src\Assets\TestProjects\LongPathProject\thisisaveryveryverylongpathanditkeepsgoing\thisisaveryveryverylongpathanditkeepsgoing\thisisaveryveryverylongpathanditkeepsgoing\thisisaveryveryverylongpathanditkeepsgoing\thisisaveryveryverylongpathanditkeepsgoing\thisisaveryveryverylongpathanditkeepsgoing\thisisaveryveryverylongpathanditkeepsgoing\thisisaveryveryverylongpathanditkeepsgoing.csproj");
 
-            var testInstance = _testAssetsManager.CopyTestAsset("thisisaveryveryverylongpathanditkeepsgoing", testAssetSubdirectory: longPathProject)
-                .WithSource()
-                .Restore(Log);
+            Log.WriteLine("targetLocation is " + targetLocation);
 
-            var cmd = new DotnetBuildCommand(Log)
-               .WithWorkingDirectory(testInstance.Path)
-               .Execute();
+            var cmd = new DotnetBuildCommand(Log, targetLocation).Execute();
 
             cmd.Should().Pass();
         }
